@@ -40,23 +40,33 @@ class DAG:
         ...
 
     def _validate(self):
-        task_to_visited_from_mapping = {str(task): set() for task in self._registered_tasks}
-        queue = []
-        current_task = self._entry_task
-        queue.append(current_task)
-        task_to_visited_from_mapping[str(current_task)].add("root")
+        queue = [self._entry_task]
+        visited_edges = set()
+        visited_tasks = set()
+        to_be_connected = set()
 
         while queue:
-            current_task: AbstractTask = queue.pop(0)
+            task = queue.pop(0)
+            if task in visited_tasks:
+                raise CycleInDAGDetectedError(task, self)
+            visited_tasks.add(task)
 
-            for downstream_task in current_task.downstream_tasks:
-                if str(current_task) in task_to_visited_from_mapping[str(downstream_task)]:
-                    raise CycleInDAGDetectedError(downstream_task, self)
-                queue.append(downstream_task)
-                task_to_visited_from_mapping[str(downstream_task)].add(current_task)
+            for downstream_task in task.downstream_tasks:
+                visited_edges.add((task, downstream_task))
+                if all(
+                    (upstream_task, downstream_task) in visited_edges
+                    for upstream_task in downstream_task.upstream_tasks
+                ):
+                    queue.append(downstream_task)
+                    if downstream_task in to_be_connected:
+                        to_be_connected.remove(downstream_task)
+                else:
+                    to_be_connected.add(downstream_task)
 
-        for task, visited in task_to_visited_from_mapping.items():
-            if len(visited) == 0:
+        for task in self._registered_tasks:
+            if task in to_be_connected:
+                raise CycleInDAGDetectedError(task, self)
+            elif task not in visited_tasks:
                 raise TaskNotConnectedError(task, self)
 
     def _prepare_task_mapping(self):

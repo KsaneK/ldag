@@ -51,8 +51,6 @@ with sum_dag:
         dag=sum_dag, task_id="print_task", func=print_sum, params={"result_key": "task_3_sum"}
     )
 
-    start_task >> [sum_task_1, sum_task_2]
-    sum_task_3 << [sum_task_1, sum_task_2]
-    sum_task_3 >> print_task
+    start_task >> [sum_task_1, sum_task_2] >> sum_task_3 >> print_task
 
     sum_dag.set_entry_task(start_task)

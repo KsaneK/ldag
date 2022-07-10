@@ -52,9 +52,19 @@ class BaseTask(AbstractTask):
 
     def __lshift__(self, other):
         self.add_upstream(other)
+        return other
 
     def __rshift__(self, other):
         self.add_downstream(other)
+        return other
+
+    def __rlshift__(self, other):
+        self.add_downstream(other)
+        return self
+
+    def __rrshift__(self, other):
+        self.add_upstream(other)
+        return self
 
     def __str__(self):
         return f"{self.__class__.__name__}-{self._task_id}"

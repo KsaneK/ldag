@@ -13,8 +13,8 @@ class TaskIdAlreadyRegisteredInDAGError(BaseTaskError):
 class CycleInDAGDetectedError(BaseTaskError):
     def __str__(self):
         return (
-            f"Cycle detected in dag {self._dag.name}."
-            f"Task {self._task.task_id} visited multiple times"
+            f"Cycle detected in dag {self._dag.name}. "
+            f"Task \"{self._task.task_id}\" visited multiple times"
         )
 
 
