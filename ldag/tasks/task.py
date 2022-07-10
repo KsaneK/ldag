@@ -1,4 +1,12 @@
+import enum
 from abc import ABC, abstractmethod
+
+
+class TaskStatus(enum.Enum):
+    QUEUED = "queued"
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
 
 
 class AbstractTask(ABC):
@@ -16,6 +24,15 @@ class AbstractTask(ABC):
     @abstractmethod
     def task_id(self):
         """Returns task id"""
+        ...
+
+    @property
+    @abstractmethod
+    def status(self) -> TaskStatus:
+        ...
+
+    @abstractmethod
+    def set_status(self, status: TaskStatus):
         ...
 
     @abstractmethod

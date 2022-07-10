@@ -11,4 +11,4 @@ class PythonTask(BaseTask):
         self._params = params
 
     def execute(self):
-        self._func(**self._params)
+        self._func(dag=self._dag, **self._params)

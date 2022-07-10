@@ -8,6 +8,7 @@ def sum_two_numbers(dag: DAG, number1_key: str, number2_key: str, output_key: st
     a = dag.params.get(number1_key)
     b = dag.params.get(number2_key)
     s = a + b
+    print(f"Task(sum_two_numbers): {a} + {b} = {s}")
     push(dag, output_key, s)
 
 
@@ -15,6 +16,7 @@ def sum_saved_numbers(dag: DAG, number1_key: str, number2_key: str, output_key: 
     saved_number_1 = pull(dag, number1_key)
     saved_number_2 = pull(dag, number2_key)
     s = saved_number_1 + saved_number_2
+    print(f"Task(sum_saved_numbers): {saved_number_1} + {saved_number_2} = {s}")
     push(dag, output_key, s)
 
 

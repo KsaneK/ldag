@@ -1,13 +1,14 @@
 from abc import abstractmethod
 from typing import Optional, Union, Iterable, List
 
-from ldag.tasks.task import AbstractTask
+from ldag.tasks.task import AbstractTask, TaskStatus
 
 
 class BaseTask(AbstractTask):
     def __init__(self, dag, task_id: str):
         self._task_id = task_id
         self._dag = dag
+        self._status: TaskStatus = TaskStatus.QUEUED
         self._downstream_tasks: List["BaseTask"] = []
         self._upstream_tasks: List["BaseTask"] = []
         self._register_in_dag()
@@ -30,6 +31,9 @@ class BaseTask(AbstractTask):
             for upstream_task in task:
                 upstream_task._downstream_tasks.append(self)
 
+    def set_status(self, status: TaskStatus):
+        self._status = status
+
     @property
     def dag(self):
         return self._dag
@@ -37,6 +41,10 @@ class BaseTask(AbstractTask):
     @property
     def task_id(self):
         return self._task_id
+
+    @property
+    def status(self) -> TaskStatus:
+        return self._status
 
     @property
     def downstream_tasks(self) -> Optional[Union["BaseTask", Iterable["BaseTask"]]]:

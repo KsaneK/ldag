@@ -1,4 +1,5 @@
 from collections import Counter
+from datetime import datetime
 from typing import Any, Dict, Set, Optional
 
 from ldag.exceptions import TaskIdAlreadyRegisteredInDAGError, CycleInDAGDetectedError, \
@@ -10,6 +11,7 @@ class DAG:
     def __init__(self, name: str, params: Dict[str, Any]):
         self._name = name
         self._params = params
+        self._run_id: Optional[str] = None
         self._entry_task: Optional[AbstractTask] = None
         self._registered_tasks: Set[AbstractTask] = set()
         self._task_mapping: Dict[str, AbstractTask] = dict()
@@ -17,6 +19,10 @@ class DAG:
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def run_id(self) -> Optional[str]:
+        return self._run_id
 
     @property
     def params(self) -> Dict[str, Any]:
@@ -38,7 +44,8 @@ class DAG:
         self._registered_tasks.add(task)
 
     def trigger(self):
-        ...
+        now = datetime.now().strftime("%Y%m%d.%H%M%S.%f")
+        self._run_id = f"{self._name}-{now}"
 
     def _validate(self):
         queue = [self._entry_task]
