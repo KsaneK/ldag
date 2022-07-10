@@ -40,23 +40,23 @@ class DAG:
         ...
 
     def _validate(self):
-        task_to_visited_mapping = {task.task_id: False for task in self._registered_tasks}
+        task_to_visited_from_mapping = {str(task): set() for task in self._registered_tasks}
         queue = []
         current_task = self._entry_task
         queue.append(current_task)
-        task_to_visited_mapping[str(current_task)] = True
+        task_to_visited_from_mapping[str(current_task)].add("root")
 
         while queue:
             current_task: AbstractTask = queue.pop(0)
 
             for downstream_task in current_task.downstream_tasks:
-                if task_to_visited_mapping[str(downstream_task)] is True:
+                if str(current_task) in task_to_visited_from_mapping[str(downstream_task)]:
                     raise CycleInDAGDetectedError(downstream_task, self)
                 queue.append(downstream_task)
-                task_to_visited_mapping[str(downstream_task)] = True
+                task_to_visited_from_mapping[str(downstream_task)].add(current_task)
 
-        for task, visited in task_to_visited_mapping.items():
-            if not visited:
+        for task, visited in task_to_visited_from_mapping.items():
+            if len(visited) == 0:
                 raise TaskNotConnectedError(task, self)
 
     def _prepare_task_mapping(self):

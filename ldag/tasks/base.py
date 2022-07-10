@@ -8,21 +8,27 @@ class BaseTask(AbstractTask):
     def __init__(self, dag, task_id: str):
         self._task_id = task_id
         self._dag = dag
-        self._downstream_tasks: List[AbstractTask] = []
-        self._upstream_tasks: List[AbstractTask] = []
+        self._downstream_tasks: List["BaseTask"] = []
+        self._upstream_tasks: List["BaseTask"] = []
         self._register_in_dag()
 
-    def add_downstream(self, task: Union[AbstractTask, Iterable[AbstractTask]]):
-        if isinstance(task, AbstractTask):
+    def add_downstream(self, task: Union["BaseTask", Iterable["BaseTask"]]):
+        if isinstance(task, BaseTask):
             self._downstream_tasks.append(task)
+            task._upstream_tasks.append(self)
         elif isinstance(task, Iterable):
             self._downstream_tasks.extend(task)
+            for downstream_task in task:
+                downstream_task._upstream_tasks.append(self)
 
-    def add_upstream(self, task: Union[AbstractTask, Iterable[AbstractTask]]):
-        if isinstance(task, AbstractTask):
+    def add_upstream(self, task: Union["BaseTask", Iterable["BaseTask"]]):
+        if isinstance(task, BaseTask):
             self._upstream_tasks.append(task)
+            task._downstream_tasks.append(self)
         elif isinstance(task, Iterable):
             self._upstream_tasks.extend(task)
+            for upstream_task in task:
+                upstream_task._downstream_tasks.append(self)
 
     @property
     def dag(self):
@@ -33,11 +39,11 @@ class BaseTask(AbstractTask):
         return self._task_id
 
     @property
-    def downstream_tasks(self) -> Optional[Union[AbstractTask, Iterable[AbstractTask]]]:
+    def downstream_tasks(self) -> Optional[Union["BaseTask", Iterable["BaseTask"]]]:
         return self._downstream_tasks
 
     @property
-    def upstream_tasks(self) -> Optional[Union[AbstractTask, Iterable[AbstractTask]]]:
+    def upstream_tasks(self) -> Optional[Union["BaseTask", Iterable["BaseTask"]]]:
         return self._upstream_tasks
 
     @abstractmethod
