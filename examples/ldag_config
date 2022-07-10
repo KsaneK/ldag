@@ -1,0 +1,3 @@
+[default]
+APP_ID=examples
+DAGS_DIRECTORY=dags/
