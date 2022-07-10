@@ -1,4 +1,4 @@
-from ldag import trigger_dag
+from ldag.trigger import trigger_dag
 
 dag_id = "calc_dag.sum_dag"
 dag_params = {
