@@ -29,6 +29,10 @@ class BaseTask(AbstractTask):
         return self._dag
 
     @property
+    def task_id(self):
+        return self._task_id
+
+    @property
     def downstream_tasks(self) -> Optional[Union[AbstractTask, Iterable[AbstractTask]]]:
         return self._downstream_tasks
 

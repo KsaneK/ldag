@@ -12,6 +12,12 @@ class AbstractTask(ABC):
         """Returns DAG associated to task"""
         ...
 
+    @property
+    @abstractmethod
+    def task_id(self):
+        """Returns task id"""
+        ...
+
     @abstractmethod
     def add_downstream(self, task):
         """Sets downstream task"""
