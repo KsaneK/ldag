@@ -1,6 +1,6 @@
 from typing import Callable, Any, Dict
 
-from ldag.task import BaseTask
+from ldag.tasks import BaseTask
 
 
 class PythonTask(BaseTask):
