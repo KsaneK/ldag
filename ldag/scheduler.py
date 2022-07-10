@@ -2,7 +2,8 @@ import copy
 import importlib
 import json
 
-from ldag import DAG_ID, DAG_PARAMS, DAG
+from ldag import DAG
+from ldag.constants import DAG_ID, DAG_PARAMS
 from ldag.config import dags_directory
 from ldag.rabbitmq import channel, tasks_queue_name
 

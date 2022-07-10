@@ -24,19 +24,20 @@ def print_sum(dag: DAG):
 
 sum_dag = DAG(name="SimpleSumDag", params={})
 
-sum_task_1 = PythonTask(
-    dag=sum_dag, task_id="sum_task_1", func=sum_two_numbers
-)
-sum_task_2 = PythonTask(
-    dag=sum_dag,
-    task_id="sum_task_2",
-    func=sum_saved_number_with_number_from_param,
-)
-print_task = PythonTask(
-    dag=sum_dag, task_id="print_task", func=print_sum
-)
+with sum_dag:
+    sum_task_1 = PythonTask(
+        dag=sum_dag, task_id="sum_task_1", func=sum_two_numbers
+    )
+    sum_task_2 = PythonTask(
+        dag=sum_dag,
+        task_id="sum_task_2",
+        func=sum_saved_number_with_number_from_param,
+    )
+    print_task = PythonTask(
+        dag=sum_dag, task_id="print_task", func=print_sum
+    )
 
-sum_task_1 >> sum_task_2
-sum_task_2 >> print_task
+    sum_task_1 >> sum_task_2
+    sum_task_2 >> print_task
 
-sum_dag.set_entry_task(sum_task_1)
+    sum_dag.set_entry_task(sum_task_1)
