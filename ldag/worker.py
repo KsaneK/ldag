@@ -1,15 +1,30 @@
+import copy
 import importlib
-import os
+import json
 
+from ldag import DAG_ID, DAG_PARAMS, DAG
 from ldag.config import dags_directory
+from ldag.rabbitmq import channel, tasks_queue_name
 
 
-file_name_to_module = {}
-for dag_file_name in os.listdir(dags_directory):
-    if dag_file_name == "__init__.py" or not dag_file_name.endswith(".py"):
-        continue
+def callback(ch, method, properties, body):
+    print("[*] New task", end="")
+    parsed_body = json.loads(body)
+    dag_id = parsed_body[DAG_ID]
+    module_name, dag_object_name = dag_id.split(".")
+    dag_params = parsed_body[DAG_PARAMS]
 
-    dag_module_name = dag_file_name[:-3]
-    file_name_to_module[dag_module_name] = (
-        importlib.import_module(f"{dags_directory}.{dag_module_name}")
+    module = (
+        importlib.import_module(f"{dags_directory}.{module_name}")
     )
+    dag_object: DAG = getattr(module, dag_object_name)
+    dag_object = copy.deepcopy(dag_object)
+    dag_object.update_params(dag_params)
+    print(f" - Triggering {dag_object}, dag_id: {dag_id}")
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
+
+channel.queue_declare(queue=tasks_queue_name, durable=True)
+channel.basic_consume(tasks_queue_name, on_message_callback=callback)
+print("[*] Waiting for tasks")
+channel.start_consuming()

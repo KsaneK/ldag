@@ -13,23 +13,23 @@ class AbstractTask(ABC):
         ...
 
     @abstractmethod
-    def set_downstream(self, task):
+    def add_downstream(self, task):
         """Sets downstream task"""
         ...
 
     @abstractmethod
-    def set_upstream(self, task):
+    def add_upstream(self, task):
         """Sets upstream task"""
         ...
 
     @property
     @abstractmethod
-    def downstream_task(self):
+    def downstream_tasks(self):
         """Returns downstream task"""
         ...
 
     @property
     @abstractmethod
-    def upstream_task(self):
+    def upstream_tasks(self):
         """Returns upstream task"""
         ...

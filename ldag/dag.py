@@ -18,6 +18,9 @@ class DAG:
     def params(self) -> Dict[str, Any]:
         return self._params
 
+    def update_params(self, params: Dict[str, Any]) -> None:
+        self._params.update(params)
+
     def set_entry_task(self, task: AbstractTask):
         self._entry_task = task
 
@@ -26,3 +29,6 @@ class DAG:
 
     def trigger(self):
         ...
+
+    def __str__(self):
+        return f"DAG(name={self._name}, params={self._params})"
