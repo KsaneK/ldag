@@ -3,7 +3,9 @@ from distutils.core import setup
 from setuptools import find_packages
 
 INSTALL_REQUIRES = [
-    "pika~=1.3"
+    "pika~=1.3",
+    "matplotlib~=3.5",
+    "networkx~=2.8"
 ]
 DEV_INSTALL_REQUIRES = []
 
