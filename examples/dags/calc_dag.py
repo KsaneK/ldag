@@ -41,7 +41,7 @@ with sum_dag:
     )
     sum_task_3 = PythonTask(
         dag=sum_dag,
-        task_id="sum_task_1",
+        task_id="sum_task_3",
         func=sum_two_numbers,
         params={
             "number1_key": "task_1_sum", "number2_key": "task_2_sum", "output_key": "task_3_sum"
@@ -55,4 +55,4 @@ with sum_dag:
     sum_task_3 << [sum_task_1, sum_task_2]
     sum_task_3 >> print_task
 
-    sum_dag.set_entry_task(sum_task_1)
+    sum_dag.set_entry_task(start_task)
