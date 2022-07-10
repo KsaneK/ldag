@@ -1,7 +1,8 @@
+from collections import Counter
 from typing import Any, Dict, Set, Optional
 
 from ldag.exceptions import TaskIdAlreadyRegisteredInDAGError, CycleInDAGDetectedError, \
-    TaskNotConnectedError
+    TaskNotConnectedError, TaskIdNotUnique
 from ldag.tasks import AbstractTask
 
 
@@ -33,7 +34,7 @@ class DAG:
 
     def register_task(self, task: AbstractTask):
         if task in self._registered_tasks:
-            raise TaskIdAlreadyRegisteredInDAGError(task=task, dag=self)
+            raise TaskIdAlreadyRegisteredInDAGError(task_id=task.task_id, dag=self)
         self._registered_tasks.add(task)
 
     def trigger(self):
@@ -48,7 +49,7 @@ class DAG:
         while queue:
             task = queue.pop(0)
             if task in visited_tasks:
-                raise CycleInDAGDetectedError(task, self)
+                raise CycleInDAGDetectedError(task_id=task.task_id, dag=self)
             visited_tasks.add(task)
 
             for downstream_task in task.downstream_tasks:
@@ -65,9 +66,14 @@ class DAG:
 
         for task in self._registered_tasks:
             if task in to_be_connected:
-                raise CycleInDAGDetectedError(task, self)
+                raise CycleInDAGDetectedError(task_id=task.task_id, dag=self)
             elif task not in visited_tasks:
-                raise TaskNotConnectedError(task, self)
+                raise TaskNotConnectedError(task_id=task.task_id, dag=self)
+
+        counter = Counter(task.task_id for task in self._registered_tasks)
+        most_common, cnt = counter.most_common(1)[0]
+        if cnt > 1:
+            raise TaskIdNotUnique(task_id=most_common, dag=self)
 
     def _prepare_task_mapping(self):
         for task in self._registered_tasks:
