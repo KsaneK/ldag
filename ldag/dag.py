@@ -1,6 +1,6 @@
-from typing import Any, Dict
+from typing import Any, Dict, Set, Optional
 
-from ldag.exceptions import TaskAlreadyRegisteredInDAGError, CycleInDAGDetectedError, \
+from ldag.exceptions import TaskIdAlreadyRegisteredInDAGError, CycleInDAGDetectedError, \
     TaskNotConnectedError
 from ldag.tasks import AbstractTask
 
@@ -9,8 +9,9 @@ class DAG:
     def __init__(self, name: str, params: Dict[str, Any]):
         self._name = name
         self._params = params
-        self._entry_task = None
-        self._registered_tasks = set()
+        self._entry_task: Optional[AbstractTask] = None
+        self._registered_tasks: Set[AbstractTask] = set()
+        self._task_mapping: Dict[str, AbstractTask] = dict()
 
     @property
     def name(self) -> str:
@@ -20,6 +21,10 @@ class DAG:
     def params(self) -> Dict[str, Any]:
         return self._params
 
+    @property
+    def entry_task(self) -> Optional[AbstractTask]:
+        return self._entry_task
+
     def update_params(self, params: Dict[str, Any]) -> None:
         self._params.update(params)
 
@@ -27,16 +32,15 @@ class DAG:
         self._entry_task = task
 
     def register_task(self, task: AbstractTask):
-        print("registering task", task)
         if task in self._registered_tasks:
-            raise TaskAlreadyRegisteredInDAGError(task=task, dag=self)
+            raise TaskIdAlreadyRegisteredInDAGError(task=task, dag=self)
         self._registered_tasks.add(task)
 
     def trigger(self):
         ...
 
     def _validate(self):
-        task_to_visited_mapping = {str(task): False for task in self._registered_tasks}
+        task_to_visited_mapping = {task.task_id: False for task in self._registered_tasks}
         queue = []
         current_task = self._entry_task
         queue.append(current_task)
@@ -54,6 +58,10 @@ class DAG:
         for task, visited in task_to_visited_mapping.items():
             if not visited:
                 raise TaskNotConnectedError(task, self)
+
+    def _prepare_task_mapping(self):
+        for task in self._registered_tasks:
+            self._task_mapping[task.task_id] = task
 
     def __str__(self):
         return f"DAG(name={self._name}, params={self._params})"
