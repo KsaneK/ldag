@@ -55,3 +55,8 @@ class BaseTask(AbstractTask):
 
     def _register_in_dag(self):
         self._dag.register_task(self)
+
+
+class DummyTask(BaseTask):
+    def execute(self):
+        pass
