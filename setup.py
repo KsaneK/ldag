@@ -2,7 +2,9 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    "pika~=1.3"
+]
 DEV_INSTALL_REQUIRES = []
 
 setup(
