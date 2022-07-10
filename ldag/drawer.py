@@ -12,6 +12,7 @@ def draw_dag(dag: DAG):
     g = nx.MultiDiGraph()
     edges = create_edges(dag.entry_task)
     g.add_edges_from(edges)
+    plt.figure(f"DAG: {dag.name}")
     nx.draw(g, connectionstyle="arc3, rad = 0.1", with_labels=True)
     plt.show()
 
