@@ -24,6 +24,7 @@ def new_task_callback(ch, method, properties, body):
     dag_object: DAG = getattr(module, dag_object_name)
     dag_object = copy.deepcopy(dag_object)
     dag_object.update_params(dag_params)
+    dag_object._run_id = run_id
     dag_object._prepare_task_mapping()
 
     task_to_execute = dag_object._task_mapping[task_id]

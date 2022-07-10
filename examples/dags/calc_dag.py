@@ -9,19 +9,19 @@ def sum_two_numbers(dag: DAG, number1_key: str, number2_key: str, output_key: st
     b = dag.params.get(number2_key)
     s = a + b
     print(f"Task(sum_two_numbers): {a} + {b} = {s}")
-    push(dag, output_key, s)
+    push(dag.run_id, output_key, s)
 
 
 def sum_saved_numbers(dag: DAG, number1_key: str, number2_key: str, output_key: str):
-    saved_number_1 = pull(dag, number1_key)
-    saved_number_2 = pull(dag, number2_key)
+    saved_number_1 = pull(dag.run_id, number1_key)
+    saved_number_2 = pull(dag.run_id, number2_key)
     s = saved_number_1 + saved_number_2
     print(f"Task(sum_saved_numbers): {saved_number_1} + {saved_number_2} = {s}")
-    push(dag, output_key, s)
+    push(dag.run_id, output_key, s)
 
 
 def print_sum(dag: DAG, result_key: str):
-    calculated_sum = pull(dag, result_key)
+    calculated_sum = pull(dag.run_id, result_key)
     print(calculated_sum)
 
 
@@ -44,7 +44,7 @@ with sum_dag:
     sum_task_3 = PythonTask(
         dag=sum_dag,
         task_id="sum_task_3",
-        func=sum_two_numbers,
+        func=sum_saved_numbers,
         params={
             "number1_key": "task_1_sum", "number2_key": "task_2_sum", "output_key": "task_3_sum"
         }
